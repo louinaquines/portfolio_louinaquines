@@ -39,6 +39,7 @@
  * ```
  */
 
+import ThemeToggle from '../components/ThemeToggle.astro';
 import { ClientRouter } from 'astro:transitions';
 import Navigation from '../components/Navigation.astro';
 import Footer from '../components/Footer.astro';
@@ -105,11 +106,25 @@ import '../styles/utilities.css';
   </head>
   <body>
     <header class="site-header" transition:persist>
-      <Navigation />
+      <div style="display:flex; justify-content:flex-end; padding:0.75rem 1.5rem; border-bottom:1px solid var(--color-border); background:var(--color-bg);">
+        <ThemeToggle />
+      </div>
     </header>
     <main>
       <slot />
     </main>
     <Footer />
+    <script>
+      document.addEventListener('astro:page-load', () => {
+        if (window.location.hash) {
+          const target = document.querySelector(window.location.hash);
+          if (target) {
+            setTimeout(() => {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 200);
+          }
+        }
+      });
+    </script>
   </body>
 </html>

@@ -23,6 +23,7 @@ import { defineConfig, envField } from 'astro/config';
 import { loadEnv } from 'vite';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import vercel from '@astrojs/vercel';
 
 /**
  * Load environment variables from .env file
@@ -47,7 +48,11 @@ export default defineConfig({
    * and hosting flexibility. All pages are pre-rendered.
    */
   output: 'static',
+  adapter: vercel(),
   
+  devToolbar: {
+    enabled: false
+  },
   /**
    * Astro integrations
    * 
@@ -105,6 +110,7 @@ export default defineConfig({
       SOCIAL_TWITTER: envField.string({ context: 'client', access: 'public', default: '' }),
       SOCIAL_MASTODON: envField.string({ context: 'client', access: 'public', default: '' }),
       SOCIAL_BLUESKY: envField.string({ context: 'client', access: 'public', default: '' }),
+      OPENROUTER_API_KEY: envField.string({ context: 'server', access: 'secret' }),
     },
   },
   

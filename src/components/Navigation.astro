@@ -28,10 +28,7 @@ const currentPath = Astro.url.pathname;
  * Combines a hardcoded Home link with navigation items from site config
  * to ensure Home is always first in the navigation.
  */
-const navItems = [
-  { label: 'Home', href: '/' },
-  ...siteConfig.nav,
-];
+
 
 /**
  * Determines if a navigation item should be marked as active

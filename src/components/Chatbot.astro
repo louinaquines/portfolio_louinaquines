@@ -1,0 +1,497 @@
+---
+/* No server-side logic needed here — API call happens in src/pages/api/chat.ts */
+---
+
+<div class="cb-wrapper">
+
+  <button id="cb-toggle" class="cb-toggle" aria-label="Open chat">
+    <svg id="cb-icon-open" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+    </svg>
+    <svg id="cb-icon-close" xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+    <span class="cb-unread" id="cb-unread" style="display:none"></span>
+  </button>
+
+  <div id="cb-window" class="cb-window" aria-hidden="true">
+
+    <div class="cb-header">
+      <div class="cb-header-avatar">
+        L
+        <span class="cb-online-dot"></span>
+      </div>
+      <div class="cb-header-meta">
+        <div class="cb-header-name">Loui's Assistant</div>
+        <div class="cb-header-status" id="cb-status">online</div>
+      </div>
+      <button id="cb-close" class="cb-header-close" aria-label="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="cb-messages" class="cb-messages">
+      <div class="cb-row cb-row-in">
+        <div class="cb-bub cb-bub-in">
+          Hi! 👋 I'm Loui's AI assistant. Ask me anything about his skills, projects, or experience!
+          <span class="cb-time">now</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="cb-typing" class="cb-typing-row" style="display:none">
+      <div class="cb-typing-pill">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="cb-input-bar">
+      <input id="cb-input" class="cb-input" type="text" placeholder="Message..." autocomplete="off" />
+      <button id="cb-send" class="cb-send" aria-label="Send">
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .cb-wrapper {
+    position: fixed !important;
+    bottom: 1.5rem !important;
+    right: 1.5rem !important;
+    z-index: 9999 !important;
+    font-family: inherit;
+  }
+
+  /* ── Toggle ── */
+  .cb-wrapper .cb-toggle {
+    position: relative;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: var(--color-text);
+    color: var(--color-bg);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 0;
+    margin: 0;
+  }
+  .cb-wrapper .cb-toggle:hover {
+    transform: scale(1.07);
+    box-shadow: 0 6px 22px rgba(0,0,0,0.28);
+  }
+  .cb-wrapper .cb-unread {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 10px;
+    height: 10px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 2px solid var(--color-bg);
+  }
+
+  /* ── Window ── */
+  .cb-wrapper .cb-window {
+    position: absolute;
+    bottom: 66px;
+    right: 0;
+    width: 355px;
+    height: 510px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.06);
+    transform-origin: bottom right;
+    transform: scale(0.88) translateY(14px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.24s cubic-bezier(0.34,1.5,0.64,1), opacity 0.18s ease;
+  }
+  .cb-wrapper .cb-window.open {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ── Header ── */
+  .cb-wrapper .cb-header {
+    padding: 0.75rem 1rem;
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-shrink: 0;
+  }
+  .cb-wrapper .cb-header-avatar {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: var(--color-text);
+    color: var(--color-bg);
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cb-wrapper .cb-online-dot {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    width: 10px;
+    height: 10px;
+    background: #22c55e;
+    border-radius: 50%;
+    border: 2px solid var(--color-bg-secondary);
+    display: block;
+  }
+  .cb-wrapper .cb-header-meta { flex: 1; min-width: 0; }
+  .cb-wrapper .cb-header-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+  }
+  .cb-wrapper .cb-header-status {
+    font-size: 0.7rem;
+    color: #22c55e;
+    font-weight: 500;
+    margin-top: 2px;
+    padding: 0;
+    transition: color 0.2s;
+  }
+  .cb-wrapper .cb-header-status.typing { color: var(--color-text-muted); }
+  .cb-wrapper .cb-header-close {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+  .cb-wrapper .cb-header-close:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+  }
+
+  /* ── Messages ── */
+  .cb-wrapper .cb-messages {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0.875rem 0.875rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    scroll-behavior: smooth;
+    background: var(--color-bg);
+    margin: 0;
+    list-style: none;
+  }
+  .cb-wrapper .cb-messages::-webkit-scrollbar { width: 4px; }
+  .cb-wrapper .cb-messages::-webkit-scrollbar-track { background: transparent; }
+  .cb-wrapper .cb-messages::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+  }
+
+  /* Date chip */
+  .cb-wrapper .cb-date-chip {
+    text-align: center;
+    font-size: 0.68rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 0.25rem 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .cb-wrapper .cb-date-chip::before,
+  .cb-wrapper .cb-date-chip::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+    display: block;
+  }
+
+  /* ── Message rows — :global so JS-created elements are styled ── */
+  :global(.cb-row) {
+    display: flex;
+    margin-top: 0.2rem;
+    padding: 0;
+    animation: cbIn 0.18s ease;
+  }
+  :global(.cb-row-in)  { justify-content: flex-start; }
+  :global(.cb-row-out) { justify-content: flex-end; }
+
+  @keyframes cbIn {
+    from { opacity: 0; transform: translateY(6px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ── Bubbles ── */
+  :global(.cb-bub) {
+    max-width: 78%;
+    padding: 0.5rem 0.75rem 0.3rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    word-break: break-word;
+    margin: 0;
+    box-sizing: border-box;
+    display: block;
+  }
+  /* AI — left, sharp top-left */
+  :global(.cb-bub-in) {
+    background: var(--color-bg-secondary) !important;
+    color: var(--color-text) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: 4px 16px 16px 16px !important;
+  }
+  /* User — right, sharp top-right */
+  :global(.cb-bub-out) {
+    background: var(--color-text) !important;
+    color: var(--color-bg) !important;
+    border: none !important;
+    border-radius: 16px 4px 16px 16px !important;
+  }
+  /* Timestamp */
+  :global(.cb-time) {
+    display: block !important;
+    font-size: 0.62rem !important;
+    line-height: 1.2 !important;
+    opacity: 0.45;
+    text-align: right;
+    margin-top: 0.25rem;
+  }
+
+  /* ── Typing indicator ── */
+  .cb-wrapper .cb-typing-row {
+    padding: 0 0.875rem 0.5rem;
+    flex-shrink: 0;
+    animation: cbIn 0.18s ease;
+  }
+  .cb-wrapper .cb-typing-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 4px 14px 14px 14px;
+    padding: 0.55rem 0.875rem;
+    height: 36px;
+  }
+  .cb-wrapper .cb-typing-pill span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-text-muted);
+    display: block;
+    animation: cbDot 1.3s infinite ease-in-out;
+  }
+  .cb-wrapper .cb-typing-pill span:nth-child(2) { animation-delay: 0.18s; }
+  .cb-wrapper .cb-typing-pill span:nth-child(3) { animation-delay: 0.36s; }
+  @keyframes cbDot {
+    0%, 55%, 100% { transform: translateY(0);    opacity: 0.4; }
+    27%           { transform: translateY(-5px); opacity: 1;   }
+  }
+
+  /* ── Input bar ── */
+  .cb-wrapper .cb-input-bar {
+    padding: 0.625rem 0.75rem;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+  .cb-wrapper .cb-input {
+    flex: 1;
+    min-width: 0;
+    background: var(--color-bg) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: 22px !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    color: var(--color-text) !important;
+    font-family: inherit !important;
+    outline: none !important;
+    box-shadow: none !important;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color 0.2s;
+  }
+  .cb-wrapper .cb-input:focus {
+    border-color: var(--color-text-muted) !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+  .cb-wrapper .cb-input::placeholder {
+    color: var(--color-text-muted) !important;
+    opacity: 1;
+  }
+  .cb-wrapper .cb-send {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    background: var(--color-text) !important;
+    color: var(--color-bg) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0;
+    padding-left: 2px;
+    box-shadow: none;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .cb-wrapper .cb-send:hover    { opacity: 0.78; transform: scale(1.07); }
+  .cb-wrapper .cb-send:disabled { opacity: 0.3 !important; cursor: not-allowed; transform: none; }
+
+  /* ── Mobile ── */
+  @media (max-width: 480px) {
+    .cb-wrapper .cb-window {
+      width: calc(100vw - 1.5rem);
+      right: -0.75rem;
+      height: 470px;
+    }
+  }
+</style>
+
+<script is:inline>
+  const toggleBtn = document.getElementById('cb-toggle');
+  const cbWindow  = document.getElementById('cb-window');
+  const closeBtn  = document.getElementById('cb-close');
+  const sendBtn   = document.getElementById('cb-send');
+  const inputEl   = document.getElementById('cb-input');
+  const msgsEl    = document.getElementById('cb-messages');
+  const typingEl  = document.getElementById('cb-typing');
+  const statusEl  = document.getElementById('cb-status');
+  const unreadEl  = document.getElementById('cb-unread');
+  const iconOpen  = document.getElementById('cb-icon-open');
+  const iconClose = document.getElementById('cb-icon-close');
+
+  let isOpen = false;
+
+  function nowTime() {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function openChat() {
+    isOpen = true;
+    cbWindow.classList.add('open');
+    cbWindow.setAttribute('aria-hidden', 'false');
+    iconOpen.style.display  = 'none';
+    iconClose.style.display = 'block';
+    unreadEl.style.display  = 'none';
+    setTimeout(() => inputEl.focus(), 230);
+  }
+  function closeChat() {
+    isOpen = false;
+    cbWindow.classList.remove('open');
+    cbWindow.setAttribute('aria-hidden', 'true');
+    iconOpen.style.display  = 'block';
+    iconClose.style.display = 'none';
+  }
+
+  toggleBtn.addEventListener('click', () => isOpen ? closeChat() : openChat());
+  closeBtn.addEventListener('click', closeChat);
+
+  // role: 'in' = AI (left) | 'out' = user (right)
+  function addBubble(text, role) {
+    const row = document.createElement('div');
+    row.className = `cb-row cb-row-${role}`;
+
+    const bub = document.createElement('div');
+    bub.className = `cb-bub cb-bub-${role}`;
+    bub.innerHTML = text.replace(/\n/g, '<br>');
+
+    const time = document.createElement('span');
+    time.className = 'cb-time';
+    time.textContent = nowTime();
+    bub.appendChild(time);
+
+    row.appendChild(bub);
+    msgsEl.appendChild(row);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+
+    if (!isOpen && role === 'in') {
+      unreadEl.style.display = 'block';
+    }
+  }
+
+  function setTyping(show) {
+    typingEl.style.display = show ? 'block' : 'none';
+    sendBtn.disabled = show;
+    statusEl.textContent = show ? 'typing...' : 'online';
+    statusEl.classList.toggle('typing', show);
+    if (show) msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text || sendBtn.disabled) return;
+
+    addBubble(text, 'out');
+    inputEl.value = '';
+    setTyping(true);
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+
+      if (!res.ok) throw new Error(`${res.status}`);
+      const data = await res.json();
+      if (!data.reply) throw new Error('empty');
+
+      setTyping(false);
+      addBubble(data.reply, 'in');
+
+    } catch (err) {
+      setTyping(false);
+      addBubble("Sorry, I'm having trouble connecting right now.", 'in');
+      console.error('ChatBot error:', err);
+    }
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+</script>
