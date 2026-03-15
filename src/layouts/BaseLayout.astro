@@ -46,6 +46,7 @@ import { siteConfig } from '../config';
 import '../styles/global.css';
 import '../styles/typography.css';
 import '../styles/utilities.css';
+import Chatbot from '../components/Chatbot.astro';
 ---
 
 <!DOCTYPE html>
@@ -112,6 +113,7 @@ import '../styles/utilities.css';
     <main>
       <slot />
     </main>
+    <ChatBot />
     <Footer />
     <script>
       document.addEventListener('astro:page-load', () => {
