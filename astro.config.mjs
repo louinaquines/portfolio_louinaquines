@@ -47,7 +47,7 @@ export default defineConfig({
    * Generates static HTML files at build time for optimal performance
    * and hosting flexibility. All pages are pre-rendered.
    */
-  output: 'static',
+  output: 'server',
   adapter: vercel(),
   
   devToolbar: {
