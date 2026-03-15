@@ -81,7 +81,9 @@ OUTPUT FORMAT — CRITICAL
 `.trim();
 
 export const POST: APIRoute = async ({ request }) => {
- try {
+  try {
+    const { message } = await request.json();
+
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
