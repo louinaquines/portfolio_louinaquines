@@ -92,7 +92,7 @@ export const POST: APIRoute = async ({ request }) => {
         'HTTP-Referer': 'https://case-efy93ka9x-louinaquines-4482s-projects.vercel.app',
       },
       body: JSON.stringify({
-        model: 'arcee-ai/trinity-large-preview:free',
+        model: 'mistralai/mistral-7b-instruct:free',
         messages: [{ role: 'user', content: `${SYSTEM_CONTEXT}\n\nUser message: ${message}` }],
         max_tokens: 200,
         temperature: 0.75,
