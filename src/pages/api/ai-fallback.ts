@@ -92,7 +92,12 @@ export const POST: APIRoute = async ({ request }) => {
         'HTTP-Referer': 'https://case-one-omega.vercel.app',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-exp:free',
+        model: 'openrouter/free',
+        models: [
+            'openrouter/free',
+            'deepseek/deepseek-chat:free',
+            'mistralai/mistral-7b-instruct:free',
+        ],
         messages: [{ role: 'user', content: `${SYSTEM_CONTEXT}\n\nUser message: ${message}` }],
         max_tokens: 200,
         temperature: 0.75,
