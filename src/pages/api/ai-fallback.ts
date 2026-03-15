@@ -92,7 +92,7 @@ export const POST: APIRoute = async ({ request }) => {
         'HTTP-Referer': 'https://case-one-omega.vercel.app',
       },
       body: JSON.stringify({
-        model: 'meta-llama/llama-3.3-70b-instruct:free',
+        model: 'openrouter/free',
         messages: [{ role: 'user', content: `${SYSTEM_CONTEXT}\n\nUser message: ${message}` }],
         max_tokens: 200,
         temperature: 0.75,
