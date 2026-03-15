@@ -33,6 +33,7 @@
     </div>
 
     <div id="cb-messages" class="cb-messages">
+      <div class="cb-date-chip">Today</div>
       <div class="cb-row cb-row-in">
         <div class="cb-bub cb-bub-in">
           Hi! 👋 I'm Loui's AI assistant. Ask me anything about his skills, projects, or experience!
@@ -458,6 +459,10 @@
     if (show) msgsEl.scrollTop = msgsEl.scrollHeight;
   }
 
+  // Persistent session ID for this browser tab
+  const sessionId = sessionStorage.getItem('chatSessionId') || crypto.randomUUID();
+  sessionStorage.setItem('chatSessionId', sessionId);
+
   async function sendMessage() {
     const text = inputEl.value.trim();
     if (!text || sendBtn.disabled) return;
@@ -467,18 +472,40 @@
     setTyping(true);
 
     try {
-      const res = await fetch('/api/chat', {
+      // Step 1: Notify server + Telegram — returns immediately
+      await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text })
+        body: JSON.stringify({ message: text, sessionId }),
       });
 
-      if (!res.ok) throw new Error(`${res.status}`);
-      const data = await res.json();
-      if (!data.reply) throw new Error('empty');
+      // Step 2: Poll /api/reply every 1s for up to 10s
+      const start = Date.now();
+      let reply = null;
+
+      while (Date.now() - start < 10000) {
+        await new Promise(r => setTimeout(r, 1000));
+        const res = await fetch(`/api/reply?sessionId=${sessionId}`);
+        const data = await res.json();
+        if (data.reply) {
+          reply = data.reply;
+          break;
+        }
+      }
+
+      // Step 3: No reply from Loui — call AI fallback
+      if (!reply) {
+        const res = await fetch('/api/ai-fallback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text }),
+        });
+        const data = await res.json();
+        reply = data.reply;
+      }
 
       setTyping(false);
-      addBubble(data.reply, 'in');
+      addBubble(reply || "Sorry, I'm having trouble right now.", 'in');
 
     } catch (err) {
       setTyping(false);

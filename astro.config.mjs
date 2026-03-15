@@ -111,6 +111,9 @@ export default defineConfig({
       SOCIAL_MASTODON: envField.string({ context: 'client', access: 'public', default: '' }),
       SOCIAL_BLUESKY: envField.string({ context: 'client', access: 'public', default: '' }),
       OPENROUTER_API_KEY: envField.string({ context: 'server', access: 'secret' }),
+
+      TELEGRAM_BOT_TOKEN: envField.string({ context: 'server', access: 'secret' }),
+      TELEGRAM_CHAT_ID:   envField.string({ context: 'server', access: 'secret' }),
     },
   },
   
