@@ -93,11 +93,6 @@ export const POST: APIRoute = async ({ request }) => {
       },
       body: JSON.stringify({
         model: 'openrouter/free',
-        models: [
-            'openrouter/free',
-            'deepseek/deepseek-chat:free',
-            'mistralai/mistral-7b-instruct:free',
-        ],
         messages: [{ role: 'user', content: `${SYSTEM_CONTEXT}\n\nUser message: ${message}` }],
         max_tokens: 200,
         temperature: 0.75,
