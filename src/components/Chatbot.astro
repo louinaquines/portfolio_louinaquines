@@ -67,6 +67,10 @@
     right: 1.5rem !important;
     z-index: 9999 !important;
     font-family: inherit;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
   /* ── Toggle ── */
@@ -86,6 +90,13 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     padding: 0;
     margin: 0;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+  }
+  .cb-wrapper .cb-toggle:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
   }
   .cb-wrapper .cb-toggle:hover {
     transform: scale(1.07);
@@ -398,160 +409,188 @@
 
   /* ── Mobile ── */
   @media (max-width: 480px) {
+    .cb-wrapper {
+      bottom: 1rem !important;
+      right: 1rem !important;
+    }
+    .cb-wrapper .cb-toggle {
+      width: 50px;
+      height: 50px;
+    }
+    .cb-wrapper .cb-window {
+      width: calc(100vw - 2rem);
+      right: -0.75rem;
+      height: calc(100vh - 180px);
+      max-height: 470px;
+      bottom: 60px;
+    }
+  }
+
+  /* Extra small screens */
+  @media (max-width: 360px) {
+    .cb-wrapper {
+      bottom: 0.75rem !important;
+      right: 0.75rem !important;
+    }
     .cb-wrapper .cb-window {
       width: calc(100vw - 1.5rem);
-      right: -0.75rem;
-      height: 470px;
+      right: -0.5rem;
     }
   }
 </style>
 
 <script is:inline>
-  const toggleBtn = document.getElementById('cb-toggle');
-  const cbWindow  = document.getElementById('cb-window');
-  const closeBtn  = document.getElementById('cb-close');
-  const sendBtn   = document.getElementById('cb-send');
-  const inputEl   = document.getElementById('cb-input');
-  const msgsEl    = document.getElementById('cb-messages');
-  const typingEl  = document.getElementById('cb-typing');
-  const statusEl  = document.getElementById('cb-status');
-  const unreadEl  = document.getElementById('cb-unread');
-  const iconOpen  = document.getElementById('cb-icon-open');
-  const iconClose = document.getElementById('cb-icon-close');
+  // Initialize chatbot when DOM is ready
+  (function() {
+    const toggleBtn = document.getElementById('cb-toggle');
+    const cbWindow  = document.getElementById('cb-window');
+    const closeBtn  = document.getElementById('cb-close');
+    const sendBtn   = document.getElementById('cb-send');
+    const inputEl   = document.getElementById('cb-input');
+    const msgsEl    = document.getElementById('cb-messages');
+    const typingEl  = document.getElementById('cb-typing');
+    const statusEl  = document.getElementById('cb-status');
+    const unreadEl  = document.getElementById('cb-unread');
+    const iconOpen  = document.getElementById('cb-icon-open');
+    const iconClose = document.getElementById('cb-icon-close');
 
-  let isOpen = false;
-  let ownerPollInterval = null;
+    // Guard: essential elements must exist
+    if (!toggleBtn || !cbWindow || !sendBtn || !inputEl) return;
 
-  function nowTime() {
-    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
+    let isOpen = false;
+    let ownerPollInterval = null;
 
-  function openChat() {
-    isOpen = true;
-    cbWindow.classList.add('open');
-    cbWindow.setAttribute('aria-hidden', 'false');
-    iconOpen.style.display  = 'none';
-    iconClose.style.display = 'block';
-    unreadEl.style.display  = 'none';
-    setTimeout(() => inputEl.focus(), 230);
-  }
-  function closeChat() {
-    isOpen = false;
-    cbWindow.classList.remove('open');
-    cbWindow.setAttribute('aria-hidden', 'true');
-    iconOpen.style.display  = 'block';
-    iconClose.style.display = 'none';
-  }
-
-  toggleBtn.addEventListener('click', () => isOpen ? closeChat() : openChat());
-  closeBtn.addEventListener('click', closeChat);
-
-  // role: 'in' = AI | 'out' = user | 'owner' = Loui (blue)
-  function addBubble(text, role) {
-    const row = document.createElement('div');
-    row.className = `cb-row ${role === 'out' ? 'cb-row-out' : 'cb-row-in'}`;
-
-    const bub = document.createElement('div');
-    bub.className = `cb-bub ${
-      role === 'out'   ? 'cb-bub-out'   :
-      role === 'owner' ? 'cb-bub-owner' :
-      'cb-bub-in'
-    }`;
-
-    if (role === 'owner') {
-      const label = document.createElement('span');
-      label.className = 'cb-owner-label';
-      label.textContent = 'Loui';
-      bub.appendChild(label);
+    function nowTime() {
+      return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
-    const textNode = document.createElement('span');
-    textNode.innerHTML = text.replace(/\n/g, '<br>');
-    bub.appendChild(textNode);
-
-    const time = document.createElement('span');
-    time.className = 'cb-time';
-    time.textContent = nowTime();
-    bub.appendChild(time);
-
-    row.appendChild(bub);
-    msgsEl.appendChild(row);
-    msgsEl.scrollTop = msgsEl.scrollHeight;
-
-    if (!isOpen && role !== 'out') {
-      unreadEl.style.display = 'block';
+    function openChat() {
+      isOpen = true;
+      cbWindow.classList.add('open');
+      cbWindow.setAttribute('aria-hidden', 'false');
+      iconOpen.style.display  = 'none';
+      iconClose.style.display = 'block';
+      unreadEl.style.display  = 'none';
+      setTimeout(() => inputEl.focus(), 230);
     }
-  }
+    function closeChat() {
+      isOpen = false;
+      cbWindow.classList.remove('open');
+      cbWindow.setAttribute('aria-hidden', 'true');
+      iconOpen.style.display  = 'block';
+      iconClose.style.display = 'none';
+    }
 
-  function setTyping(show) {
-    typingEl.style.display = show ? 'block' : 'none';
-    sendBtn.disabled = show;
-    statusEl.textContent = show ? 'typing...' : 'online';
-    statusEl.classList.toggle('typing', show);
-    if (show) msgsEl.scrollTop = msgsEl.scrollHeight;
-  }
+    toggleBtn.addEventListener('click', () => isOpen ? closeChat() : openChat());
+    closeBtn.addEventListener('click', closeChat);
 
-  // Start persistent polling for Loui's replies (runs as long as page is open)
-  function startOwnerPoll(sessionId) {
-    if (ownerPollInterval) clearInterval(ownerPollInterval);
-    ownerPollInterval = setInterval(async () => {
+    // role: 'in' = AI | 'out' = user | 'owner' = Loui (blue)
+    function addBubble(text, role) {
+      const row = document.createElement('div');
+      row.className = `cb-row ${role === 'out' ? 'cb-row-out' : 'cb-row-in'}`;
+
+      const bub = document.createElement('div');
+      bub.className = `cb-bub ${
+        role === 'out'   ? 'cb-bub-out'   :
+        role === 'owner' ? 'cb-bub-owner' :
+        'cb-bub-in'
+      }`;
+
+      if (role === 'owner') {
+        const label = document.createElement('span');
+        label.className = 'cb-owner-label';
+        label.textContent = 'Loui';
+        bub.appendChild(label);
+      }
+
+      const textNode = document.createElement('span');
+      textNode.innerHTML = text.replace(/\n/g, '<br>');
+      bub.appendChild(textNode);
+
+      const time = document.createElement('span');
+      time.className = 'cb-time';
+      time.textContent = nowTime();
+      bub.appendChild(time);
+
+      row.appendChild(bub);
+      msgsEl.appendChild(row);
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+
+      if (!isOpen && role !== 'out') {
+        unreadEl.style.display = 'block';
+      }
+    }
+
+    function setTyping(show) {
+      typingEl.style.display = show ? 'block' : 'none';
+      sendBtn.disabled = show;
+      statusEl.textContent = show ? 'typing...' : 'online';
+      statusEl.classList.toggle('typing', show);
+      if (show) msgsEl.scrollTop = msgsEl.scrollHeight;
+    }
+
+    // Start persistent polling for Loui's replies (runs as long as page is open)
+    function startOwnerPoll(sessionId) {
+      if (ownerPollInterval) clearInterval(ownerPollInterval);
+      ownerPollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/reply?sessionId=${sessionId}`);
+          const data = await res.json();
+          if (data.reply) {
+            addBubble(data.reply, 'owner');
+          }
+        } catch (_) {}
+      }, 3000);
+    }
+
+    // Persistent session ID for this browser tab
+    const sessionId = sessionStorage.getItem('chatSessionId') || crypto.randomUUID();
+    sessionStorage.setItem('chatSessionId', sessionId);
+
+    // Start polling for owner replies immediately on page load
+    startOwnerPoll(sessionId);
+
+    async function sendMessage() {
+      const text = inputEl.value.trim();
+      if (!text || sendBtn.disabled) return;
+
+      addBubble(text, 'out');
+      inputEl.value = '';
+      setTyping(true);
+
       try {
-        const res = await fetch(`/api/reply?sessionId=${sessionId}`);
+        // Step 1: Send message to server + notify Loui on Telegram
+        await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, sessionId }),
+        });
+
+        // Step 2: AI replies immediately — no waiting for Loui
+        const res = await fetch('/api/ai-fallback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text }),
+        });
         const data = await res.json();
-        if (data.reply) {
-          addBubble(data.reply, 'owner');
-        }
-      } catch (_) {}
-    }, 3000);
-  }
+        setTyping(false);
+        addBubble(data.reply || "Sorry, I'm having trouble right now.", 'in');
 
-  // Persistent session ID for this browser tab
-  const sessionId = sessionStorage.getItem('chatSessionId') || crypto.randomUUID();
-  sessionStorage.setItem('chatSessionId', sessionId);
+        // Loui's reply will appear automatically via the background poll (startOwnerPoll)
 
-  // Start polling for owner replies immediately on page load
-  startOwnerPoll(sessionId);
-
-  async function sendMessage() {
-    const text = inputEl.value.trim();
-    if (!text || sendBtn.disabled) return;
-
-    addBubble(text, 'out');
-    inputEl.value = '';
-    setTyping(true);
-
-    try {
-      // Step 1: Send message to server + notify Loui on Telegram
-      await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, sessionId }),
-      });
-
-      // Step 2: AI replies immediately — no waiting for Loui
-      const res = await fetch('/api/ai-fallback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text }),
-      });
-      const data = await res.json();
-      setTyping(false);
-      addBubble(data.reply || "Sorry, I'm having trouble right now.", 'in');
-
-      // Loui's reply will appear automatically via the background poll (startOwnerPoll)
-
-    } catch (err) {
-      setTyping(false);
-      addBubble("Sorry, I'm having trouble connecting right now.", 'in');
-      console.error('ChatBot error:', err);
+      } catch (err) {
+        setTyping(false);
+        addBubble("Sorry, I'm having trouble connecting right now.", 'in');
+        console.error('ChatBot error:', err);
+      }
     }
-  }
 
-  sendBtn.addEventListener('click', sendMessage);
-  inputEl.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  });
+    sendBtn.addEventListener('click', sendMessage);
+    inputEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  })();
 </script>
