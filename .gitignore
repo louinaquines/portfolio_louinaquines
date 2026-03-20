@@ -62,3 +62,6 @@ coverage/
 .settings/
 *.sublime-project
 *.sublime-workspace
+
+# Vercel
+.vercel/
