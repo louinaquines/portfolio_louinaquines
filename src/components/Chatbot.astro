@@ -93,9 +93,15 @@
     -webkit-tap-highlight-color: transparent;
     outline: none;
   }
+  .cb-wrapper .cb-toggle:hover {
+    background: var(--color-accent);
+  }
   :global(.dark) .cb-wrapper .cb-toggle {
     background: var(--color-bg);
     color: var(--color-text);
+  }
+  :global(.dark) .cb-wrapper .cb-toggle:hover {
+    background: var(--color-bg-elevated);
   }
   .cb-wrapper .cb-toggle:focus-visible {
     outline: 2px solid var(--color-accent);
