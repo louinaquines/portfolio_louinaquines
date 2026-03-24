@@ -400,7 +400,7 @@ const galleryImages = [
         <button class="modal-close" id="close-projects-modal" aria-label="Close">&times;</button>
       </div>
       <div class="modal-body">
-        {allProjectsSorted.length > 0 ? (
+        {false ? (
           <div class="modal-projects-grid">
             {allProjectsSorted.map(project => (
               <a href={`/projects/${project.id}`} class="modal-project-card">
@@ -411,8 +411,12 @@ const galleryImages = [
             ))}
           </div>
         ) : (
-          <div class="modal-empty">
-            <p>No projects yet. Add your projects to the <code>projects</code> content collection.</p>
+          <div class="modal-projects-grid">
+            <a href="#" class="modal-project-card">
+              <span class="project-role">Your Role</span>
+              <h3 class="project-title">Project Title</h3>
+              <p class="project-desc">A brief description of your project and what you accomplished.</p>
+            </a>
           </div>
         )}
       </div>
