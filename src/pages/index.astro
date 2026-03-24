@@ -24,8 +24,6 @@ const featuredProjects = allProjects
   .sort((a, b) => (a.data.order || 999) - (b.data.order || 999))
   .slice(0, 4);
 
-const allProjectsSorted = allProjects
-  .sort((a, b) => (a.data.order || 999) - (b.data.order || 999));
 
 const techStack = {
   Frontend: [
@@ -594,17 +592,6 @@ const galleryImages = [
     openExpBtn?.addEventListener('click', openExpModal);
     closeExpBtn?.addEventListener('click', closeExpModal);
     expBackdrop?.addEventListener('click', closeExpModal);
-
-    // ── PROJECTS CARD MODAL (kept for "View All" in projects section) ──
-    const projectsModal = document.getElementById('projects-modal');
-    const openBtn = document.getElementById('open-projects-modal');
-    const closeBtn = document.getElementById('close-projects-modal');
-    const modalBackdrop = document.getElementById('modal-backdrop');
-    function openModal() { projectsModal?.classList.add('active'); document.body.style.overflow = 'hidden'; }
-    function closeModal() { projectsModal?.classList.remove('active'); document.body.style.overflow = ''; }
-    if (openBtn) { openBtn.addEventListener('click', openModal); }
-    if (closeBtn) { closeBtn.addEventListener('click', closeModal); }
-    if (modalBackdrop) { modalBackdrop.addEventListener('click', closeModal); }
 
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
