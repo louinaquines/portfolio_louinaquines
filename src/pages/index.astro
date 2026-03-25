@@ -1406,8 +1406,22 @@ const galleryImages = [
     border: 1px solid rgba(255,255,255,0.08);
   }
   [data-theme="light"] .modal-panel {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  [data-theme="light"] .modal-header {
+    border-bottom-color: #e5e5e5;
+  }
+  [data-theme="light"] .modal-title {
+    color: #171717;
+  }
+  [data-theme="light"] .modal-close {
+    color: #525252;
+  }
+  [data-theme="light"] .modal-close:hover {
+    color: #171717;
   }
 
   /* Light mode modal content */
