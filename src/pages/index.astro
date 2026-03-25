@@ -402,10 +402,43 @@ const galleryImages = [
             <input class="sc-input" type="email" id="hire-email" placeholder="your@email.com" required />
           </div>
           <div class="sc-field">
-            <label class="sc-label" for="hire-message">Tell me about the app, website, or feature you want me to build...</label>
-            <textarea class="sc-input sc-textarea" id="hire-message" rows="5" required></textarea>
+            <label class="sc-label" for="hire-project-type">Project Type</label>
+            <select class="sc-input" id="hire-project-type" required>
+              <option value="" disabled selected>Select project type</option>
+              <option value="full-stack">Full-Stack Web App</option>
+              <option value="mobile-app">Mobile App</option>
+              <option value="portfolio">Portfolio/Landing Page</option>
+              <option value="ai-integration">AI Integration</option>
+              <option value="ecommerce">E-commerce</option>
+            </select>
           </div>
-          <button type="submit" class="sc-submit" id="hire-submit">Send Request</button>
+          <div class="sc-row">
+            <div class="sc-field">
+              <label class="sc-label" for="hire-budget">Budget</label>
+              <select class="sc-input" id="hire-budget" required>
+                <option value="" disabled selected>Select budget</option>
+                <option value="under-10k">&lt; ₱10k</option>
+                <option value="10k-50k">₱10k - ₱50k</option>
+                <option value="50k-plus">₱50k+</option>
+                <option value="not-sure">Not sure</option>
+              </select>
+            </div>
+            <div class="sc-field">
+              <label class="sc-label" for="hire-timeline">Timeline</label>
+              <select class="sc-input" id="hire-timeline" required>
+                <option value="" disabled selected>Select timeline</option>
+                <option value="asap">ASAP</option>
+                <option value="1-month">1 Month</option>
+                <option value="3-months">3+ Months</option>
+                <option value="flexible">Flexible</option>
+              </select>
+            </div>
+          </div>
+          <div class="sc-field">
+            <label class="sc-label" for="hire-message">Project Brief</label>
+            <textarea class="sc-input sc-textarea" id="hire-message" rows="5" placeholder="Describe the core features you need (e.g., 'I need a real-time tracking system for commuters')." required></textarea>
+          </div>
+          <button type="submit" class="sc-submit" id="hire-submit">Send Inquiry →</button>
         </form>
       </div>
     </div>
@@ -1750,6 +1783,37 @@ const galleryImages = [
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
   }
   .sc-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* Select dropdown styling */
+  .sc-input[type="select"],
+  select.sc-input {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23737373' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+  select.sc-input option {
+    background: var(--color-bg-secondary);
+    color: var(--color-text);
+    padding: 0.5rem;
+  }
+
+  /* Form row for Budget and Timeline */
+  .sc-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  @media (max-width: 480px) {
+    .sc-row {
+      grid-template-columns: 1fr;
+    }
+  }
   .sc-success {
     display: none;
   }
