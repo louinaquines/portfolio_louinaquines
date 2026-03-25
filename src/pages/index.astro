@@ -144,7 +144,7 @@ const galleryImages = [
         <section class="card reveal reveal-up" style="animation-delay:0.2s">
           <div class="card-title-row">
             <h2 class="card-title"><svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Recent Projects</h2>
-            <button class="view-all" id="open-projects-modal">View All &rsaquo;</button>
+            <button class="view-all" id="open-projects-modal-alt">View All &rsaquo;</button>
           </div>
           <div class="projects-grid">
             {false ? featuredProjects.map(project => (
@@ -487,6 +487,11 @@ const galleryImages = [
     function openProjectsModal()  { projectsModal?.classList.add('active');    document.body.style.overflow = 'hidden'; }
     function closeProjectsModal() { projectsModal?.classList.remove('active'); document.body.style.overflow = ''; }
     openProjectsBtn?.addEventListener('click', openProjectsModal);
+    
+    // Also handle the "View All" button in Recent Projects section
+    const openProjectsAltBtn = document.getElementById('open-projects-modal-alt');
+    openProjectsAltBtn?.addEventListener('click', openProjectsModal);
+    
     closeProjectsBtn?.addEventListener('click', closeProjectsModal);
     projectsModalBackdrop?.addEventListener('click', closeProjectsModal);
 
@@ -1367,8 +1372,59 @@ const galleryImages = [
     border: 1px solid rgba(255,255,255,0.08);
   }
   [data-theme="light"] .modal-panel {
-    background: rgba(245, 245, 245, 0.92);
-    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  /* Light mode modal content */
+  [data-theme="light"] .modal-project-card {
+    background: #ffffff;
+    border-color: #e5e5e5;
+  }
+  [data-theme="light"] .modal-project-card:hover {
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  }
+  [data-theme="light"] .mpc-role-badge {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(124, 58, 237, 0.15));
+    border-color: rgba(124, 58, 237, 0.25);
+    color: #7c3aed;
+  }
+  [data-theme="light"] .mpc-title {
+    color: #171717;
+  }
+  [data-theme="light"] .mpc-desc {
+    color: #525252;
+  }
+  [data-theme="light"] .mpc-tech {
+    color: #737373;
+  }
+  [data-theme="light"] .gallery-modal-intro {
+    color: #525252;
+  }
+  [data-theme="light"] .sc-desc {
+    color: #525252;
+  }
+  [data-theme="light"] .sc-input {
+    background: #ffffff;
+    border-color: #d4d4d4;
+    color: #171717;
+  }
+  [data-theme="light"] .sc-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+  [data-theme="light"] .sc-input::placeholder {
+    color: #a3a3a3;
+  }
+  [data-theme="light"] .sc-label {
+    color: #171717;
+  }
+  [data-theme="light"] .sc-submit {
+    box-shadow: none;
+  }
+  [data-theme="light"] .sc-submit:hover {
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
   }
 
   /* ── GALLERY MODAL PROJECTS ── */
@@ -1750,14 +1806,15 @@ const galleryImages = [
     }
   }
   @media (max-width: 500px) {
-    /* Full-screen modals on mobile */
+    /* Center modals on mobile */
     .modal-overlay { 
-      padding: 0; 
-      align-items: flex-end; 
+      padding: 1rem; 
+      align-items: center; 
+      justify-content: center;
     }
     .modal-panel {
-      border-radius: 20px 20px 0 0;
-      max-height: 92vh;
+      border-radius: 16px;
+      max-height: 85vh;
       width: 100%;
       max-width: 100%;
       margin: 0;
