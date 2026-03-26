@@ -21,9 +21,11 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "set-webhook": "node scripts/set-webhook.js"
   },
   "dependencies": {
+    "dotenv": "^16.4.0",
     "@astrojs/mdx": "^4.0.0",
     "@astrojs/sitemap": "^3.6.1",
     "@astrojs/vercel": "^9.0.4",

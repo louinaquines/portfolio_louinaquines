@@ -7,12 +7,14 @@ const redis = Redis.fromEnv();
 
 export const GET: APIRoute = async ({ url }) => {
   const sessionId = url.searchParams.get('sessionId');
+  console.log('Reply poll - sessionId:', sessionId);
 
   if (!sessionId) {
     return new Response(JSON.stringify({ reply: null }), { status: 400 });
   }
 
   const reply = await redis.get<string>(`reply:${sessionId}`);
+  console.log('Reply poll - found:', reply ? 'yes' : 'no');
 
   if (reply) {
     // Clean up after reading so it doesn't get sent twice

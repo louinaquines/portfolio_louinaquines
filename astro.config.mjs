@@ -114,6 +114,9 @@ export default defineConfig({
 
       TELEGRAM_BOT_TOKEN: envField.string({ context: 'server', access: 'secret' }),
       TELEGRAM_CHAT_ID:   envField.string({ context: 'server', access: 'secret' }),
+      
+      // Vercel deployment URL (automatically set by Vercel)
+      VERCEL_URL: envField.string({ context: 'server', access: 'public', default: '' }),
     },
   },
   

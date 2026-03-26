@@ -21,7 +21,9 @@ export const POST: APIRoute = async ({ request }) => {
     await redis.del(`reply:${sessionId}`);
 
     // Mark this as the active session so the webhook knows where to deliver
-    await redis.set('active:session', sessionId, { ex: 60 });
+    // Store under the chat ID key so we can track the active session for this specific user
+    const chatIdStr = String(TELEGRAM_CHAT_ID);
+    await redis.set(`active:${chatIdStr}`, sessionId, { ex: 300 });
 
     // Send Telegram notification to Loui
     const text = `💬 *New portfolio message!*\n\n${message}\n\n_Reply within 10s or AI responds._\n\`Session: ${sessionId.slice(0, 8)}\``;
