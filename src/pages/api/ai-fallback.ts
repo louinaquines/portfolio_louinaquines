@@ -121,6 +121,10 @@ export const POST: APIRoute = async ({ request }) => {
       .replace(/^#{1,6}\s+/gm, '')
       .replace(/^[-*]\s+/gm, '')
       .replace(/^(User|Assistant|Human|AI):\s*/gim, '')
+      // Normalize whitespace - replace multiple spaces with single space
+      .replace(/[ \t]+/g, ' ')
+      // Ensure proper line break spacing
+      .replace(/\n\s*\n/g, '\n')
       .trim();
 
     return new Response(JSON.stringify({ reply, source: 'ai' }), {
