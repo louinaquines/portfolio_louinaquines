@@ -502,27 +502,23 @@ const galleryImages = [
 <script>
   document.addEventListener('astro:page-load', () => {
     const bgMusic = document.getElementById('bg-music') as HTMLAudioElement | null;
+
     if (bgMusic) {
-      bgMusic.volume = 0.2;
+      bgMusic.volume = 0.5;
+      bgMusic.muted = false;
 
-      const startMusic = () => {
-        bgMusic.play().catch(() => {
-          // Autoplay can be blocked; fallback listeners handle first user interaction.
-        });
+      const startMusic = async () => {
+        try {
+          await bgMusic.play();
+          return true;
+        } catch {
+          return false;
+        }
       };
 
-      startMusic();
-
-      const unlockAndPlay = () => {
-        startMusic();
-        document.removeEventListener('pointerdown', unlockAndPlay);
-        document.removeEventListener('keydown', unlockAndPlay);
-        document.removeEventListener('touchstart', unlockAndPlay);
-      };
-
-      document.addEventListener('pointerdown', unlockAndPlay, { once: true });
-      document.addEventListener('keydown', unlockAndPlay, { once: true });
-      document.addEventListener('touchstart', unlockAndPlay, { once: true });
+      void startMusic();
+      bgMusic.addEventListener('loadedmetadata', () => { void startMusic(); });
+      bgMusic.addEventListener('canplaythrough', () => { void startMusic(); });
     }
 
     // ── PAGE LOADER ──
