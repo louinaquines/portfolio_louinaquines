@@ -75,6 +75,9 @@ const galleryImages = [
   <StructuredData type="Person" />
 
   <main class="page">
+    <audio id="bg-music" preload="auto" loop>
+      <source src="/audio/Seven.mp3" type="audio/mpeg" />
+    </audio>
 
     <!-- ── PAGE LOADER ── -->
     <div id="page-loader" class="page-loader">
@@ -315,15 +318,6 @@ const galleryImages = [
           </div>
         </section>
 
-        <!-- AUDIO -->
-        <section class="card reveal reveal-left" style="animation-delay:0.25s">
-          <h2 class="card-title">Featured Audio</h2>
-          <p class="card-sub">Listen to "Seven".</p>
-          <audio controls preload="metadata" class="audio-player">
-            <source src="/audio/Seven.mp3" type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
-        </section>
       </div>
     </div>
   </main>
@@ -507,6 +501,29 @@ const galleryImages = [
 
 <script>
   document.addEventListener('astro:page-load', () => {
+    const bgMusic = document.getElementById('bg-music') as HTMLAudioElement | null;
+    if (bgMusic) {
+      bgMusic.volume = 0.2;
+
+      const startMusic = () => {
+        bgMusic.play().catch(() => {
+          // Autoplay can be blocked; fallback listeners handle first user interaction.
+        });
+      };
+
+      startMusic();
+
+      const unlockAndPlay = () => {
+        startMusic();
+        document.removeEventListener('pointerdown', unlockAndPlay);
+        document.removeEventListener('keydown', unlockAndPlay);
+        document.removeEventListener('touchstart', unlockAndPlay);
+      };
+
+      document.addEventListener('pointerdown', unlockAndPlay, { once: true });
+      document.addEventListener('keydown', unlockAndPlay, { once: true });
+      document.addEventListener('touchstart', unlockAndPlay, { once: true });
+    }
 
     // ── PAGE LOADER ──
     const loader = document.getElementById('page-loader');
@@ -931,10 +948,6 @@ const galleryImages = [
     color: var(--color-text-secondary);
     line-height: 1.5;
     margin: 0;
-  }
-
-  .audio-player {
-    width: 100%;
   }
 
   /* ── PROJECTS MODAL ── */
