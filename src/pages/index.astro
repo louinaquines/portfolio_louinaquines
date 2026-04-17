@@ -75,7 +75,7 @@ const galleryImages = [
   <StructuredData type="Person" />
 
   <main class="page">
-    <audio id="bg-music" preload="auto" loop>
+    <audio id="bg-music" preload="auto" loop autoplay muted playsinline>
       <source src="/audio/Seven.mp3" type="audio/mpeg" />
     </audio>
 
@@ -505,11 +505,16 @@ const galleryImages = [
 
     if (bgMusic) {
       bgMusic.volume = 0.5;
-      bgMusic.muted = false;
+      bgMusic.muted = true;
 
       const startMusic = async () => {
         try {
           await bgMusic.play();
+          // Try to unmute after autoplay begins.
+          setTimeout(() => {
+            bgMusic.muted = false;
+            bgMusic.volume = 0.5;
+          }, 250);
           return true;
         } catch {
           return false;
