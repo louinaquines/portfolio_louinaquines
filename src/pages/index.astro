@@ -521,9 +521,17 @@ const galleryImages = [
         }
       };
 
+      const unlockAudio = async () => {
+        bgMusic.muted = false;
+        bgMusic.volume = 0.5;
+        await startMusic();
+      };
+
       void startMusic();
       bgMusic.addEventListener('loadedmetadata', () => { void startMusic(); });
       bgMusic.addEventListener('canplaythrough', () => { void startMusic(); });
+      document.addEventListener('pointerdown', () => { void unlockAudio(); }, { once: true });
+      document.addEventListener('keydown', () => { void unlockAudio(); }, { once: true });
     }
 
     // ── PAGE LOADER ──
